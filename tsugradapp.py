@@ -96,8 +96,7 @@ plot_tree(
     feature_names=["GPA", "Attendance", "Hours"],
     class_names=["Low/Med", "High"],
     filled=True,
-    fontsize=12,
-    label='none'  # 👈 This disables 'True/False' split labels
+    fontsize=12  # <- makes "True" / "False" labels and nodes more visible
 )
 st.pyplot(fig)
 
