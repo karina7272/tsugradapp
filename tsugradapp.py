@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1y4zNVjOh7AYcCp4BqmqggehiV2HL__if
 """
 
-!pip install streamlit pyngrok
-
 import matplotlib.pyplot as plt
 
 from PIL import Image
