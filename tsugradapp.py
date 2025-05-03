@@ -7,83 +7,110 @@ Original file is located at
     https://colab.research.google.com/drive/1y4zNVjOh7AYcCp4BqmqggehiV2HL__if
 """
 
-# TSU AI Graduation Success Companion - Colab Prototype
+# TSU AI Graduation Success Companion - Enhanced Version
 
 import streamlit as st
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 import matplotlib.pyplot as plt
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
 
-st.set_page_config(page_title="TSU Graduation Success", layout="centered")
-
-# --- Simulated Student Dataset ---
-students = pd.DataFrame([
-    {"Name": "Alice Chen", "GPA": 2.3, "Credits": 24, "Attendance": 78, "AtRisk": 1},
-    {"Name": "Brian Lee", "GPA": 3.4, "Credits": 90, "Attendance": 95, "AtRisk": 0},
-    {"Name": "Clara Diaz", "GPA": 2.7, "Credits": 45, "Attendance": 88, "AtRisk": 0},
-    {"Name": "David Kim", "GPA": 1.9, "Credits": 18, "Attendance": 60, "AtRisk": 1},
-    {"Name": "Emma Patel", "GPA": 3.8, "Credits": 100, "Attendance": 97, "AtRisk": 0},
-])
-
-X = students[['GPA', 'Credits', 'Attendance']]
-y = students['AtRisk']
-model = RandomForestClassifier().fit(X, y)
-
-def predict_risk(gpa, credits, attendance):
-    return model.predict([[gpa, credits, attendance]])[0]
-
-def generate_plan(credits, semester):
-    if credits < 30 and semester == "Fall":
-        return "Enroll in UNIV1000, join Xtreme Winter, and attend weekly tutoring."
-    elif credits < 60:
-        return "Take SUNsational summer courses and meet Success Specialist."
-    else:
-        return "On track. Consider Honors/Graduate preparation."
-
-def generate_message(name, gpa, risk):
-    if risk:
-        return f"Hi {name}, we noticed your GPA is {gpa}. Let's build a plan together — your success matters."
-    return f"Hi {name}, you're doing great with a GPA of {gpa}. Let’s explore enrichment opportunities."
-
-policy_faq = {
-    "maymester_tuition": "Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver.",
-    "withdrawal_policy": "Withdrawal before midterm may avoid grade penalty. Always meet with your advisor first."
-}
-
-# --- UI ---
+# Title
 st.title("🎓 TSU AI Graduation Success Companion")
 
+# Sidebar - Student Input
 st.sidebar.header("📊 Enter Student Info")
-gpa = st.sidebar.slider("GPA", 0.0, 4.0, 2.5)
-credits = st.sidebar.number_input("Credit Hours Completed", 0, 150, 30)
-attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, 85)
-semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring"])
-name = st.sidebar.text_input("Student Name", "John Doe")
+gpa = st.sidebar.slider("GPA", 0.00, 4.00, 2.51)
+credit_hours = st.sidebar.number_input("Credit Hours Completed", min_value=0, value=33)
+attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, 48)
+semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"])
+student_name = st.sidebar.text_input("Student Name", "John Doe")
 
-# --- Risk Prediction ---
-st.subheader("🚨 Risk Prediction")
+# Simulated model for prediction (placeholder for trained classifier)
+def predict_risk(gpa, credit_hours, attendance):
+    if gpa < 2.5 or attendance < 70:
+        return "High"
+    elif 2.5 <= gpa < 3.0 or 70 <= attendance < 85:
+        return "Medium"
+    else:
+        return "Low"
+
+# Predict Risk
+st.subheader("⚠️ Risk Prediction")
 if st.button("Predict Academic Risk"):
-    risk_flag = predict_risk(gpa, credits, attendance)
-    st.success(f"Predicted Risk Level: {'High' if risk_flag else 'Low'}")
+    risk_level = predict_risk(gpa, credit_hours, attendance)
+    st.success(f"Predicted Risk Level: {risk_level}")
 
-# --- Advising Plan ---
-st.subheader("📌 Personalized Advising Plan")
-plan = generate_plan(credits, semester)
-st.info(plan)
+    # Risk explanation
+    st.markdown("""
+    - The model assesses GPA, attendance, and progress toward credit hour completion.
+    - A GPA below 2.5 signals academic vulnerability in core or gateway courses.
+    - Attendance below 70% is associated with disengagement and poor performance.
+    - Limited credit accumulation can reflect slow progression toward graduation.
+    - Risk categorization helps prioritize students for proactive support.
+    - The model classifies risk as High, Medium, or Low based on composite thresholds.
+    - Students flagged High may benefit from urgent advising and academic alerts.
+    - Those at Medium risk often need skill-building and success coaching.
+    - Low-risk students are monitored for any decline but generally perform steadily.
+    - This prediction is used to generate customized advising and policy suggestions.
+    """)
 
-# --- Communication Message ---
+# Personalized Advising Plan
+st.subheader("🧭 Personalized Advising Plan")
+advising_text = (
+    "Based on your GPA, attendance, and academic progress, we recommend meeting with a Success Specialist."
+    " Consider enrolling in TSU's SUNsational summer term to improve GPA. Join tutoring, peer coaching, and develop a recovery plan."
+    " Regular check-ins with your advisor can help track improvement milestones."
+    " Align academic goals with achievable steps for the next semester."
+    " Participation in student success workshops is highly encouraged."
+    " Build consistent study routines and track weekly GPA and attendance."
+    " Consider reviewing course schedules to reduce overload and stress."
+    " Ensure clear understanding of academic probation or warning policies."
+    " Engage with a faculty mentor in your major to increase accountability."
+    " Review TSU policies on GPA recovery and graduation eligibility with your advisor."
+)
+st.info(advising_text)
+
+# Outreach Message
 st.subheader("📢 Outreach Message")
-risk_check = predict_risk(gpa, credits, attendance)
-st.text_area("Generated Message", value=generate_message(name, gpa, risk_check), height=150)
+message = f"Hi {student_name}, we noticed your GPA is {gpa}. Let's build a plan together — your success matters. Please check in with your advisor to co-create a support roadmap. Your commitment plus TSU resources can help you succeed."
+st.text_area("Generated Message", value=message, height=100)
 
-# --- Policy FAQ ---
+# TSU Policy Advisor
 st.subheader("📘 TSU Policy Advisor")
-query = st.selectbox("Ask About:", list(policy_faq.keys()))
-st.write(policy_faq[query])
+topic = st.selectbox("Ask About:", ["maymester_tuition", "academic_warning", "probation_policy"])
+if topic == "maymester_tuition":
+    st.markdown("Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver.")
+elif topic == "academic_warning":
+    st.markdown("Academic Warning applies to students with GPA below 2.0 in one semester. Support plan is required.")
+elif topic == "probation_policy":
+    st.markdown("Students on Academic Probation must raise GPA above 2.0 within one term to avoid suspension.")
 
-# --- GPA Chart ---
+# GPA Chart
 st.subheader("📈 GPA Snapshot")
 fig, ax = plt.subplots()
 ax.bar(["Student GPA"], [gpa], color='purple')
 ax.set_ylim(0, 4)
 st.pyplot(fig)
+
+# --- Simulated Students Table ---
+st.subheader("🧪 Student Simulation Scenarios with GenAI Insight")
+students = pd.DataFrame([
+    ["Alice", 2.3, 33, 65],
+    ["Brian", 3.5, 90, 85],
+    ["Carla", 2.7, 45, 80],
+    ["Dion", 1.9, 55, 60],
+    ["Eva", 3.8, 100, 92],
+    ["Frank", 2.5, 70, 75],
+    ["Grace", 3.1, 88, 88],
+    ["Hassan", 2.0, 30, 50],
+    ["Isla", 2.9, 78, 82],
+    ["Jamal", 1.7, 20, 58],
+], columns=["Name", "GPA", "Credit Hours", "Attendance"])
+
+students["Risk"] = students.apply(lambda row: predict_risk(row["GPA"], row["Credit Hours"], row["Attendance"]), axis=1)
+
+st.dataframe(students)
+
+st.markdown("---")
+st.caption("Prototype powered by GenAI and TSU Graduation Success Strategies")
