@@ -11,81 +11,95 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 
-# Student Scenarios
-students = {
-    "John Doe": {"GPA": 2.51, "Attendance": 48, "Credits": 33, "Semester": "Spring"},
-    "Alicia James": {"GPA": 3.8, "Attendance": 94, "Credits": 90, "Semester": "Fall"},
-    "Brian West": {"GPA": 2.0, "Attendance": 60, "Credits": 45, "Semester": "Summer"},
-    "Clara Lee": {"GPA": 3.2, "Attendance": 85, "Credits": 70, "Semester": "Spring"},
-    "Derek Young": {"GPA": 1.9, "Attendance": 50, "Credits": 30, "Semester": "Fall"},
-    "Ella Smith": {"GPA": 2.7, "Attendance": 75, "Credits": 80, "Semester": "Summer"},
-    "Farah Khan": {"GPA": 3.0, "Attendance": 88, "Credits": 110, "Semester": "Spring"},
-    "George Lin": {"GPA": 2.4, "Attendance": 66, "Credits": 40, "Semester": "Fall"},
-    "Helen Zane": {"GPA": 2.9, "Attendance": 82, "Credits": 95, "Semester": "Summer"},
-    "Isaiah Bond": {"GPA": 2.3, "Attendance": 58, "Credits": 50, "Semester": "Spring"},
+# Student profiles for simulation
+students_data = {
+    "John Doe": {"GPA": 2.51, "Hours": 33, "Attendance": 48, "Semester": "Spring"},
+    "Jane Smith": {"GPA": 3.2, "Hours": 62, "Attendance": 92, "Semester": "Fall"},
+    "Aliyah Green": {"GPA": 1.9, "Hours": 27, "Attendance": 50, "Semester": "Summer"},
+    "Carlos Rivera": {"GPA": 2.7, "Hours": 45, "Attendance": 72, "Semester": "Fall"},
+    "Brian West": {"GPA": 2.0, "Hours": 45, "Attendance": 36, "Semester": "Summer"},
+    "Hannah Lee": {"GPA": 3.9, "Hours": 90, "Attendance": 98, "Semester": "Spring"},
+    "Samir Khan": {"GPA": 2.3, "Hours": 60, "Attendance": 60, "Semester": "Spring"},
+    "Ava Brooks": {"GPA": 2.8, "Hours": 75, "Attendance": 85, "Semester": "Fall"},
+    "Marcus King": {"GPA": 2.5, "Hours": 50, "Attendance": 65, "Semester": "Summer"},
+    "Emily Clark": {"GPA": 3.6, "Hours": 100, "Attendance": 99, "Semester": "Fall"}
 }
 
-# Sidebar Input
-st.sidebar.title("Select Student")
-selected_student = st.sidebar.selectbox("", list(students.keys()))
-data = students[selected_student]
+# Sidebar Inputs
+st.sidebar.header("Select Student")
+selected_name = st.sidebar.selectbox("", list(students_data.keys()))
+student = students_data[selected_name]
 
-st.sidebar.title("Enter Student Info")
-gpa = st.sidebar.slider("GPA", 0.0, 4.0, float(data['GPA']), step=0.01)
-credits = st.sidebar.number_input("Credit Hours Completed", min_value=0, value=int(data['Credits']))
-attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, int(data['Attendance']))
-semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"], index=["Fall", "Spring", "Summer"].index(data['Semester']))
+st.sidebar.markdown("### Enter Student Info")
+gpa = st.sidebar.slider("GPA", 0.0, 4.0, student["GPA"], 0.01)
+hours = st.sidebar.number_input("Credit Hours Completed", 0, 150, student["Hours"])
+attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, student["Attendance"])
+semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"], index=["Fall", "Spring", "Summer"].index(student["Semester"]))
 
 # Title
 st.title("\U0001F393 TSU AI Graduation Success Companion")
 
-# Risk Prediction
-st.subheader("\U0001F9E0 Risk Prediction")
-if gpa < 2.5 or attendance < 70:
-    risk = "High"
-    color = "#d4edda"
-else:
-    risk = "Low"
-    color = "#d1ecf1"
+# Risk Prediction Section
+st.subheader("\U0001F4AB Risk Prediction")
 st.button("Predict Academic Risk")
-st.markdown(f'<div style="background-color:{color};padding:10px;border-radius:5px">Predicted Risk Level: <b>{risk}</b></div>', unsafe_allow_html=True)
 
-# Explanation
-st.subheader("\U0001F9D1‍\U0001F4BB Personalized Advising Plan")
-advising_text = (
-    f"Based on your inputs (GPA {gpa}, attendance {attendance}%), your advising plan includes targeted support. "
-    "Engage in structured academic workshops, time management training, and one-on-one peer mentorship. Continued advisor meetings will be required, and you are encouraged to use the Student Success Center. Flexible course scheduling and summer courses may be discussed. "
-    "Recovery milestones and weekly check-ins will track your progress. Plan adjustments will be based on academic recovery markers. Your path to graduation is possible with consistent effort and full engagement."
-)
-st.info(advising_text)
+# Risk Logic
+risk = "High" if gpa < 2.5 or attendance < 70 else "Medium" if gpa < 3.0 else "Low"
+st.success(f"Predicted Risk Level: {risk}")
 
-# Outreach
+# Risk Explanation (10 sentence textflow)
+st.markdown("""
+A student's predicted academic risk is calculated based on GPA, attendance, and credit progression.
+GPA below 2.5 triggers high-risk categorization due to potential academic probation.
+Attendance lower than 70% correlates with reduced class performance and disengagement.
+Credit hour accumulation helps assess time-to-degree and momentum.
+High-risk students may face barriers like academic burnout, life stressors, or unclear goals.
+The model weighs historical patterns and aligns thresholds with graduation benchmarks.
+GPA volatility over time may also indicate unstable academic standing.
+Low attendance can signal logistical issues or lack of motivation.
+The AI model continuously adjusts predictions with new inputs.
+Early identification allows for timely advising, targeted support, and retention efforts.
+""")
+
+# Personalized Advising Plan
+st.subheader("\U0001F9D1\u200D\U0001F4DA Personalized Advising Plan")
+st.info(f"""
+Based on your inputs (GPA {gpa}, attendance {attendance}%), your advising plan includes targeted support.
+Engage in structured academic workshops, time management training, and one-on-one peer mentorship.
+Continued advisor meetings will be required, and you are encouraged to use the Student Success Center.
+Flexible course scheduling and summer courses may be discussed.
+Recovery milestones and weekly check-ins will track your progress.
+Plan adjustments will be based on academic recovery markers.
+Your path to graduation is possible with consistent effort and full engagement.
+Faculty engagement will support personalized interventions.
+Advisors may recommend bridge programs, tutoring, or course repetitions.
+Progress should be monitored through GPA dashboards and feedback loops.
+""")
+
+# Outreach Message
 st.subheader("\U0001F4E2 Outreach Message")
 st.markdown("**Generated Message**")
-message = f"Hi {selected_student}, we noticed your GPA is {gpa}. Your success matters — let's build a tailored support plan this semester. Please meet with your advisor and take advantage of academic coaching and summer bridge opportunities."
-st.text_area("", value=message, height=100)
+st.text_area("", f"Hi {selected_name}, we noticed your GPA is {gpa}. Your success matters — let's build a tailored support plan this semester. Please meet with your advisor and take advantage of academic coaching and summer bridge opportunities.", height=100)
 
-# TSU Policy Advisory
-st.subheader("\U0001F4DA TSU Policy Advisor")
-policy_option = st.selectbox("Ask About:", ["maymester_tuition", "credit_limit", "summer_enrollment"])
-if policy_option == "maymester_tuition":
-    policy_msg = "Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver."
-elif policy_option == "credit_limit":
-    policy_msg = "Students above 90 hours may require override for additional courses."
+# TSU Policy Advisor
+st.subheader("\U0001F4C8 TSU Policy Advisor")
+policy = st.selectbox("Ask About:", ["maymester_tuition", "credit_limit", "housing_support"])
+if policy == "maymester_tuition":
+    msg = "Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver."
+elif policy == "credit_limit":
+    msg = "Students above 90 hours may require override for additional courses."
 else:
-    policy_msg = "Summer enrollment support may depend on GPA and advisor clearance."
-st.markdown(policy_msg)
+    msg = "Eligible students can access TSU housing support under special programs."
+st.write(msg)
 
-policy_expl = (
-    "Our policies support student success by providing GPA-linked waivers, course load guidance, and semester planning flexibility. "
-    "Students nearing graduation may be eligible for overrides or tailored course pathways. Understanding policies helps reduce risk of delay, especially with summer and intersession terms. "
-    "Advisors will guide you through these policies so you can make informed decisions about graduation planning, financial aid eligibility, and load management."
-)
-st.caption(policy_expl)
+# Policy Advisor Insight (10 sentences)
+st.markdown("""
+TSU academic policies are designed to support progression and graduation. Credit limits are enforced to manage academic workload. GPA thresholds influence eligibility for financial aid, summer enrollment, and course load exceptions. Understanding policies helps students navigate exceptions with advisor support. Policy advisement ensures students remain on track within institutional compliance. For example, Maymester tuition waivers can reduce financial strain while keeping students on schedule. Housing support provides additional structure for at-risk students. Advisors guide appeals or overrides aligned with student goals. Clear policy communication reduces drop-off due to misunderstanding. Policy insights help tailor student recovery plans effectively.
+""")
 
-# GPA Snapshot
+# GPA Snapshot Chart
 st.subheader("\U0001F4CA GPA Snapshot")
-st.markdown("**Linear GPA Chart**")
-fig = go.Figure(data=[go.Bar(x=["Student GPA"], y=[gpa], marker_color='purple')])
-fig.update_layout(height=400, yaxis=dict(range=[0, 4]))
+st.markdown("**Linear GPA Visualization**")
+fig = go.Figure(data=[go.Bar(x=["Student GPA"], y=[gpa], marker_color='lightblue')])
+fig.update_layout(yaxis=dict(range=[0, 4]))
 st.plotly_chart(fig)
