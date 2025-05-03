@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+import numpy as np
 
 # Student profiles for simulation
 students_data = {
@@ -47,11 +47,34 @@ st.title("\U0001F393 TSU AI Graduation Success Companion")
 st.subheader("\U0001F4AB Risk Prediction")
 st.button("Predict Academic Risk")
 
-# Risk Logic
+# Rule-Based Risk Logic
 risk = "High" if gpa < 2.5 or attendance < 70 else "Medium" if gpa < 3.0 else "Low"
-st.success(f"Predicted Risk Level: {risk}")
+st.success(f"Predicted Risk Level (Rule-Based): {risk}")
 
-# Risk Explanation (10 sentence textflow)
+# ML-Based Logistic Regression Risk Prediction
+# Training dummy data for logistic regression
+X_train = np.array([
+    [2.0, 35, 40], [2.5, 50, 60], [3.0, 60, 80], [1.8, 30, 45], [2.7, 55, 75],
+    [3.5, 70, 90], [2.2, 40, 50], [3.1, 80, 95], [2.6, 65, 70], [3.8, 100, 98]
+])
+y_train = [1, 1, 0, 1, 0, 0, 1, 0, 0, 0]  # 1 = High Risk, 0 = Low Risk
+
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+X_input = np.array([[gpa, hours, attendance]])
+pred_ml = model.predict(X_input)[0]
+ml_risk_prediction = "High" if pred_ml == 1 else "Low"
+
+st.subheader("\U0001F916 ML-Based Risk Score")
+st.info(f"Logistic Regression Risk Prediction: {ml_risk_prediction}")
+
+# Explanation
+st.markdown("""
+This advising path is shaped by both rule-based and ML risk insights. If both models indicate high risk, structured recovery is essential. If ML flags risk while rule-based does not, explore unseen data issues like inconsistent effort or mid-term dips. When both models agree on low risk, maintain consistency and set aspirational goals. Dual prediction paths allow advisors to adjust intensity of interventions accordingly. AI enables early detection and personalization. Using both models enhances accuracy. Where disagreement exists, closer review of performance trends is recommended. ML identifies hidden risk patterns not always visible in current GPA. Rule-based logic supports transparency and simplicity. Together, they offer a holistic student success map.
+""")
+
+# Risk Explanation
 st.markdown("""
 A student's predicted academic risk is calculated based on GPA, attendance, and credit progression.
 GPA below 2.5 triggers high-risk categorization due to potential academic probation.
@@ -65,40 +88,8 @@ The AI model continuously adjusts predictions with new inputs.
 Early identification allows for timely advising, targeted support, and retention efforts.
 """)
 
-# ML-Based Risk Prediction
-st.subheader("\U0001F916 ML-Based Logistic Regression Risk Score")
-training_data = pd.DataFrame({
-    'GPA': [2.0, 2.3, 3.0, 3.5, 1.8, 2.7, 2.5, 2.1, 3.2, 2.9],
-    'Attendance': [55, 60, 85, 95, 45, 70, 80, 58, 90, 88],
-    'Credit_Hours': [30, 40, 60, 90, 25, 50, 70, 35, 80, 65],
-    'Risk_Label': [1, 1, 0, 0, 1, 0, 0, 1, 0, 0]
-})
-X = training_data[['GPA', 'Attendance', 'Credit_Hours']]
-y = training_data['Risk_Label']
-ml_model = LogisticRegression()
-ml_model.fit(X, y)
-new_input = pd.DataFrame([{'GPA': gpa, 'Attendance': attendance, 'Credit_Hours': hours}])
-prob = ml_model.predict_proba(new_input)[0][1]
-predicted_label = ml_model.predict(new_input)[0]
-pred_text = "High" if predicted_label == 1 else "Low"
-st.info(f"ML Predicted Risk: {pred_text} ({prob*100:.2f}%)")
-
-# Personalized Combined Path
-st.markdown("""
-Based on both the rule-based and ML risk scores, this student may require multi-layered support.
-Weekly academic coaching, tutoring referrals, and GPA recovery benchmarks should be considered.
-Proactive communication and advisor outreach are recommended.
-The advising plan should incorporate SMART goals tied to class performance and credit hour recovery.
-Flexible scheduling options may enhance attendance and reduce overload.
-Motivational strategies and goal-tracking tools can reinforce progress.
-Integrated feedback loops between faculty and advising ensure real-time monitoring.
-Any early gains should be reinforced to build momentum.
-Students at this profile should also receive policy navigation assistance.
-Engagement and belief in the plan are critical to long-term academic recovery.
-""")
-
 # Personalized Advising Plan
-st.subheader("\U0001F9D1‍\U0001F4DA Personalized Advising Plan")
+st.subheader("\U0001F9D1\u200D\U0001F4DA Personalized Advising Plan")
 st.info(f"""
 Based on your inputs (GPA {gpa}, attendance {attendance}%), your advising plan includes targeted support.
 Engage in structured academic workshops, time management training, and one-on-one peer mentorship.
@@ -128,24 +119,21 @@ else:
     msg = "Eligible students can access TSU housing support under special programs."
 st.write(msg)
 
-# Policy Advisor Insight (10 sentences)
+# Policy Advisor Insight
 st.markdown("""
 TSU academic policies are designed to support progression and graduation. Credit limits are enforced to manage academic workload. GPA thresholds influence eligibility for financial aid, summer enrollment, and course load exceptions. Understanding policies helps students navigate exceptions with advisor support. Policy advisement ensures students remain on track within institutional compliance. For example, Maymester tuition waivers can reduce financial strain while keeping students on schedule. Housing support provides additional structure for at-risk students. Advisors guide appeals or overrides aligned with student goals. Clear policy communication reduces drop-off due to misunderstanding. Policy insights help tailor student recovery plans effectively.
 """)
 
-# Title and Setup
-st.title("📊 GPA Snapshot")
+# GPA Snapshot
+st.title("\U0001F4CA GPA Snapshot")
 st.markdown("### Linear GPA Visualization")
 
-# Sample GPA data per semester for the selected student
 gpa_data = {
     "Semester": ["Spring", "Summer", "Fall"],
-    "GPA": [gpa - 0.2, gpa, gpa + 0.1]
+    "GPA": [gpa - 0.3, gpa - 0.1, gpa]  # Simulated trend
 }
-
 df = pd.DataFrame(gpa_data)
 
-# Linear Chart
 fig, ax = plt.subplots()
 ax.plot(df["Semester"], df["GPA"], marker='o', linestyle='-', color='skyblue')
 ax.set_title("GPA Over Semesters")
@@ -153,6 +141,4 @@ ax.set_xlabel("Semester")
 ax.set_ylabel("GPA")
 ax.set_ylim(0, 4)
 ax.grid(True)
-
-# Show plot in Streamlit
 st.pyplot(fig)
