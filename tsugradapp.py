@@ -13,8 +13,9 @@ from PIL import Image
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 
-# Student profiles for simulation
+# Student profiles
 students_data = {
     "John Doe": {"GPA": 2.51, "Hours": 33, "Attendance": 48, "Semester": "Spring"},
     "Jane Smith": {"GPA": 3.2, "Hours": 62, "Attendance": 92, "Semester": "Fall"},
@@ -42,15 +43,13 @@ semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"]
 # Title
 st.title("🎓 TSU AI Graduation Success Companion")
 
-# Risk Prediction Section
+# Risk Prediction
 st.subheader("💫 Risk Prediction")
 st.button("Predict Academic Risk")
-
-# Risk Logic
 risk = "High" if gpa < 2.5 or attendance < 70 else "Medium" if gpa < 3.0 else "Low"
 st.success(f"Predicted Risk Level: {risk}")
 
-# Risk Explanation (10 sentence textflow)
+# Explanation
 st.markdown("""
 A student's predicted academic risk is calculated based on GPA, attendance, and credit progression.
 GPA below 2.5 triggers high-risk categorization due to potential academic probation.
@@ -64,7 +63,7 @@ The AI model continuously adjusts predictions with new inputs.
 Early identification allows for timely advising, targeted support, and retention efforts.
 """)
 
-# ML-Based Advising Prediction Section
+# ML-Based Advising
 st.subheader("🔹 ML-Based Advising Plan (AI-Powered Predictions)")
 st.markdown("""
 1. Based on your GPA of 2.5 and attendance rate of 48%, there is a 67% predicted risk of delayed graduation if no intervention is applied.
@@ -79,13 +78,21 @@ st.markdown("""
 10. Without targeted support, the model predicts a 51% probability of falling into academic probation within two terms — proactive advising is strongly recommended.
 """)
 
-# Decision Tree Visualization
+# Decision Tree Visualization (No PNG)
 st.markdown("### 📉 Decision Tree Visualization for Your Advising Path")
-try:
-    tree_image = Image.open("/mnt/data/b2c05682-02e8-490d-b969-64ee298ebe62.png")
-    st.image(tree_image, caption="AI-Guided Decision Tree Based on GPA, Attendance, and Credit Hours", use_column_width=True)
-except FileNotFoundError:
-    st.error("Decision Tree image not found. Please upload 'student_decision_tree.png' to /mnt/data/")
+tree_data = pd.DataFrame({
+    "GPA": [2.51, 3.2, 1.9, 2.7, 2.0, 3.9, 2.3, 2.8, 2.5, 3.6],
+    "Attendance": [48, 92, 50, 72, 36, 98, 60, 85, 65, 99],
+    "Hours": [33, 62, 27, 45, 45, 90, 60, 75, 50, 100],
+    "Risk": [1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+})
+X = tree_data[["GPA", "Attendance", "Hours"]]
+y = tree_data["Risk"]
+model = DecisionTreeClassifier(max_depth=3)
+model.fit(X, y)
+fig, ax = plt.subplots(figsize=(10, 5))
+plot_tree(model, feature_names=["GPA", "Attendance", "Hours"], class_names=["Low/Med", "High"], filled=True)
+st.pyplot(fig)
 
 # Personalized Advising Plan
 st.subheader("🧑‍📚 Personalized Advising Plan")
@@ -102,35 +109,29 @@ Advisors may recommend bridge programs, tutoring, or course repetitions.
 Progress should be monitored through GPA dashboards and feedback loops.
 """)
 
-# Outreach Message
+# Outreach
 st.subheader("📢 Outreach Message")
-st.markdown("**Generated Message**")
 st.text_area("", f"Hi {selected_name}, we noticed your GPA is {gpa}. Your success matters — let's build a tailored support plan this semester. Please meet with your advisor and take advantage of academic coaching and summer bridge opportunities.", height=100)
 
 # TSU Policy Advisor
 st.subheader("📊 TSU Policy Advisor")
 policy = st.selectbox("Ask About:", ["maymester_tuition", "credit_limit", "housing_support"])
-if policy == "maymester_tuition":
-    msg = "Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver."
-elif policy == "credit_limit":
-    msg = "Students above 90 hours may require override for additional courses."
-else:
-    msg = "Eligible students can access TSU housing support under special programs."
+msg = {
+    "maymester_tuition": "Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver.",
+    "credit_limit": "Students above 90 hours may require override for additional courses.",
+    "housing_support": "Eligible students can access TSU housing support under special programs."
+}[policy]
 st.write(msg)
 
-# Policy Advisor Insight
+# TSU Policy Insight
 st.markdown("""
 TSU academic policies are designed to support progression and graduation. Credit limits are enforced to manage academic workload. GPA thresholds influence eligibility for financial aid, summer enrollment, and course load exceptions. Understanding policies helps students navigate exceptions with advisor support. Policy advisement ensures students remain on track within institutional compliance. For example, Maymester tuition waivers can reduce financial strain while keeping students on schedule. Housing support provides additional structure for at-risk students. Advisors guide appeals or overrides aligned with student goals. Clear policy communication reduces drop-off due to misunderstanding. Policy insights help tailor student recovery plans effectively.
 """)
 
-# GPA Snapshot
+# GPA Chart
 st.title("📊 GPA Snapshot")
 st.markdown("### Linear GPA Visualization")
-
-gpa_data = {
-    "Semester": ["Spring", "Summer", "Fall"],
-    "GPA": [2.2, 2.4, gpa]  # Simulated GPA progression
-}
+gpa_data = {"Semester": ["Spring", "Summer", "Fall"], "GPA": [2.2, 2.4, gpa]}
 df = pd.DataFrame(gpa_data)
 fig, ax = plt.subplots()
 ax.plot(df["Semester"], df["GPA"], marker='o', linestyle='-', color='skyblue')
