@@ -7,6 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1y4zNVjOh7AYcCp4BqmqggehiV2HL__if
 """
 
+!pip install streamlit pyngrok
+
 import matplotlib.pyplot as plt
 
 from PIL import Image
@@ -41,7 +43,7 @@ attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, student["Attendanc
 semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"], index=["Fall", "Spring", "Summer"].index(student["Semester"]))
 
 # Title
-st.title("🎓 TSU AI Graduation Success Companion")
+st.title("🎓 TSU Navigate AI: Data-Driven Advising for Retention & Progression Tool")
 
 # Risk Prediction
 st.subheader("💫 Risk Prediction")
