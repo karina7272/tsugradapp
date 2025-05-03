@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from sklearn.linear_model import LogisticRegression
+import matplotlib.pyplot as plt
 
 # Student profiles for simulation
 students_data = {
@@ -63,8 +65,40 @@ The AI model continuously adjusts predictions with new inputs.
 Early identification allows for timely advising, targeted support, and retention efforts.
 """)
 
+# ML-Based Risk Prediction
+st.subheader("\U0001F916 ML-Based Logistic Regression Risk Score")
+training_data = pd.DataFrame({
+    'GPA': [2.0, 2.3, 3.0, 3.5, 1.8, 2.7, 2.5, 2.1, 3.2, 2.9],
+    'Attendance': [55, 60, 85, 95, 45, 70, 80, 58, 90, 88],
+    'Credit_Hours': [30, 40, 60, 90, 25, 50, 70, 35, 80, 65],
+    'Risk_Label': [1, 1, 0, 0, 1, 0, 0, 1, 0, 0]
+})
+X = training_data[['GPA', 'Attendance', 'Credit_Hours']]
+y = training_data['Risk_Label']
+ml_model = LogisticRegression()
+ml_model.fit(X, y)
+new_input = pd.DataFrame([{'GPA': gpa, 'Attendance': attendance, 'Credit_Hours': hours}])
+prob = ml_model.predict_proba(new_input)[0][1]
+predicted_label = ml_model.predict(new_input)[0]
+pred_text = "High" if predicted_label == 1 else "Low"
+st.info(f"ML Predicted Risk: {pred_text} ({prob*100:.2f}%)")
+
+# Personalized Combined Path
+st.markdown("""
+Based on both the rule-based and ML risk scores, this student may require multi-layered support.
+Weekly academic coaching, tutoring referrals, and GPA recovery benchmarks should be considered.
+Proactive communication and advisor outreach are recommended.
+The advising plan should incorporate SMART goals tied to class performance and credit hour recovery.
+Flexible scheduling options may enhance attendance and reduce overload.
+Motivational strategies and goal-tracking tools can reinforce progress.
+Integrated feedback loops between faculty and advising ensure real-time monitoring.
+Any early gains should be reinforced to build momentum.
+Students at this profile should also receive policy navigation assistance.
+Engagement and belief in the plan are critical to long-term academic recovery.
+""")
+
 # Personalized Advising Plan
-st.subheader("\U0001F9D1\u200D\U0001F4DA Personalized Advising Plan")
+st.subheader("\U0001F9D1‍\U0001F4DA Personalized Advising Plan")
 st.info(f"""
 Based on your inputs (GPA {gpa}, attendance {attendance}%), your advising plan includes targeted support.
 Engage in structured academic workshops, time management training, and one-on-one peer mentorship.
@@ -99,10 +133,6 @@ st.markdown("""
 TSU academic policies are designed to support progression and graduation. Credit limits are enforced to manage academic workload. GPA thresholds influence eligibility for financial aid, summer enrollment, and course load exceptions. Understanding policies helps students navigate exceptions with advisor support. Policy advisement ensures students remain on track within institutional compliance. For example, Maymester tuition waivers can reduce financial strain while keeping students on schedule. Housing support provides additional structure for at-risk students. Advisors guide appeals or overrides aligned with student goals. Clear policy communication reduces drop-off due to misunderstanding. Policy insights help tailor student recovery plans effectively.
 """)
 
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
-
 # Title and Setup
 st.title("📊 GPA Snapshot")
 st.markdown("### Linear GPA Visualization")
@@ -110,7 +140,7 @@ st.markdown("### Linear GPA Visualization")
 # Sample GPA data per semester for the selected student
 gpa_data = {
     "Semester": ["Spring", "Summer", "Fall"],
-    "GPA": [2.2, 2.4, 2.5]  # Replace with dynamic input if integrating into app
+    "GPA": [gpa - 0.2, gpa, gpa + 0.1]
 }
 
 df = pd.DataFrame(gpa_data)
