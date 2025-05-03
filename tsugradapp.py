@@ -7,6 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1y4zNVjOh7AYcCp4BqmqggehiV2HL__if
 """
 
+import matplotlib.pyplot as plt
+
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
