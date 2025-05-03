@@ -99,11 +99,30 @@ st.markdown("""
 TSU academic policies are designed to support progression and graduation. Credit limits are enforced to manage academic workload. GPA thresholds influence eligibility for financial aid, summer enrollment, and course load exceptions. Understanding policies helps students navigate exceptions with advisor support. Policy advisement ensures students remain on track within institutional compliance. For example, Maymester tuition waivers can reduce financial strain while keeping students on schedule. Housing support provides additional structure for at-risk students. Advisors guide appeals or overrides aligned with student goals. Clear policy communication reduces drop-off due to misunderstanding. Policy insights help tailor student recovery plans effectively.
 """)
 
-# GPA Chart
-st.header("📊 GPA Snapshot")
-st.markdown("**Linear GPA Visualization**")
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Title and Setup
+st.title("📊 GPA Snapshot")
+st.markdown("### Linear GPA Visualization")
+
+# Sample GPA data per semester for the selected student
+gpa_data = {
+    "Semester": ["Spring", "Summer", "Fall"],
+    "GPA": [2.2, 2.4, 2.5]  # Replace with dynamic input if integrating into app
+}
+
+df = pd.DataFrame(gpa_data)
+
+# Linear Chart
 fig, ax = plt.subplots()
-ax.bar("Student GPA", gpa, color="lightblue")
-ax.set_ylim(0, 4)
+ax.plot(df["Semester"], df["GPA"], marker='o', linestyle='-', color='skyblue')
+ax.set_title("GPA Over Semesters")
+ax.set_xlabel("Semester")
 ax.set_ylabel("GPA")
+ax.set_ylim(0, 4)
+ax.grid(True)
+
+# Show plot in Streamlit
 st.pyplot(fig)
