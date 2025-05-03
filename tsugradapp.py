@@ -7,85 +7,85 @@ Original file is located at
     https://colab.research.google.com/drive/1y4zNVjOh7AYcCp4BqmqggehiV2HL__if
 """
 
-# TSU AI Graduation Success Companion - Colab Prototype with 3D GPA Chart
-
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import plotly.graph_objects as go
-from sklearn.ensemble import RandomForestClassifier
 
-# 10 Simulated Student Scenarios
-students_data = [
-    {"name": "John Doe", "gpa": 2.51, "hours": 33, "attendance": 48, "semester": "Spring"},
-    {"name": "Alice Chen", "gpa": 3.8, "hours": 75, "attendance": 98, "semester": "Fall"},
-    {"name": "Brian Lee", "gpa": 1.9, "hours": 20, "attendance": 62, "semester": "Summer"},
-    {"name": "Clara Diaz", "gpa": 2.0, "hours": 45, "attendance": 70, "semester": "Spring"},
-    {"name": "David Kim", "gpa": 3.1, "hours": 90, "attendance": 88, "semester": "Fall"},
-    {"name": "Emma Patel", "gpa": 2.6, "hours": 55, "attendance": 72, "semester": "Summer"},
-    {"name": "Frank Soto", "gpa": 2.3, "hours": 35, "attendance": 66, "semester": "Spring"},
-    {"name": "Grace Wang", "gpa": 3.5, "hours": 100, "attendance": 94, "semester": "Fall"},
-    {"name": "Hassan Ali", "gpa": 2.0, "hours": 30, "attendance": 50, "semester": "Spring"},
-    {"name": "Isabella Cruz", "gpa": 3.9, "hours": 105, "attendance": 99, "semester": "Summer"},
-]
-
-# Create DataFrame
-students_df = pd.DataFrame(students_data)
+# Student Scenarios
+students = {
+    "John Doe": {"GPA": 2.51, "Attendance": 48, "Credits": 33, "Semester": "Spring"},
+    "Alicia James": {"GPA": 3.8, "Attendance": 94, "Credits": 90, "Semester": "Fall"},
+    "Brian West": {"GPA": 2.0, "Attendance": 60, "Credits": 45, "Semester": "Summer"},
+    "Clara Lee": {"GPA": 3.2, "Attendance": 85, "Credits": 70, "Semester": "Spring"},
+    "Derek Young": {"GPA": 1.9, "Attendance": 50, "Credits": 30, "Semester": "Fall"},
+    "Ella Smith": {"GPA": 2.7, "Attendance": 75, "Credits": 80, "Semester": "Summer"},
+    "Farah Khan": {"GPA": 3.0, "Attendance": 88, "Credits": 110, "Semester": "Spring"},
+    "George Lin": {"GPA": 2.4, "Attendance": 66, "Credits": 40, "Semester": "Fall"},
+    "Helen Zane": {"GPA": 2.9, "Attendance": 82, "Credits": 95, "Semester": "Summer"},
+    "Isaiah Bond": {"GPA": 2.3, "Attendance": 58, "Credits": 50, "Semester": "Spring"},
+}
 
 # Sidebar Input
-selected_name = st.sidebar.selectbox("Select Student", students_df["name"])
-selected_student = students_df[students_df["name"] == selected_name].iloc[0]
+st.sidebar.title("Select Student")
+selected_student = st.sidebar.selectbox("", list(students.keys()))
+data = students[selected_student]
 
-st.sidebar.write("---")
-st.sidebar.write("### Enter Student Info")
-gpa = st.sidebar.slider("GPA", 0.00, 4.00, float(selected_student["gpa"]))
-hours = st.sidebar.number_input("Credit Hours Completed", min_value=0, max_value=120, value=int(selected_student["hours"]))
-attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, int(selected_student["attendance"]))
-semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"], index=["Fall", "Spring", "Summer"].index(selected_student["semester"]))
+st.sidebar.title("Enter Student Info")
+gpa = st.sidebar.slider("GPA", 0.0, 4.0, float(data['GPA']), step=0.01)
+credits = st.sidebar.number_input("Credit Hours Completed", min_value=0, value=int(data['Credits']))
+attendance = st.sidebar.slider("Attendance Rate (%)", 0, 100, int(data['Attendance']))
+semester = st.sidebar.selectbox("Current Semester", ["Fall", "Spring", "Summer"], index=["Fall", "Spring", "Summer"].index(data['Semester']))
 
-# Model Prediction Logic
-model = RandomForestClassifier()
-dummy_X = pd.DataFrame({"GPA": [2.0, 2.5, 3.0, 3.5], "Hours": [30, 60, 90, 120], "Attendance": [50, 70, 85, 95]})
-dummy_y = ["High", "Medium", "Low", "Low"]
-model.fit(dummy_X, dummy_y)
-predicted_risk = model.predict([[gpa, hours, attendance]])[0]
-
-# App Layout
+# Title
 st.title("\U0001F393 TSU AI Graduation Success Companion")
 
+# Risk Prediction
 st.subheader("\U0001F9E0 Risk Prediction")
+if gpa < 2.5 or attendance < 70:
+    risk = "High"
+    color = "#d4edda"
+else:
+    risk = "Low"
+    color = "#d1ecf1"
 st.button("Predict Academic Risk")
-st.success(f"Predicted Risk Level: {predicted_risk}")
+st.markdown(f'<div style="background-color:{color};padding:10px;border-radius:5px">Predicted Risk Level: <b>{risk}</b></div>', unsafe_allow_html=True)
 
-st.subheader("\U0001F4AA Personalized Advising Plan")
-advising_text = f"Based on your inputs (GPA {gpa}, attendance {attendance}%), your advising plan includes targeted support. Engage in structured academic workshops, time management training, and one-on-one peer mentorship. Continued advisor meetings will be required, and you are encouraged to use the Student Success Center. Flexible course scheduling and summer courses may be discussed. Recovery milestones and weekly check-ins will track your progress. Plan adjustments will be based on academic recovery markers. Your path to graduation is possible with consistent effort and full engagement."
+# Explanation
+st.subheader("\U0001F9D1‍\U0001F4BB Personalized Advising Plan")
+advising_text = (
+    f"Based on your inputs (GPA {gpa}, attendance {attendance}%), your advising plan includes targeted support. "
+    "Engage in structured academic workshops, time management training, and one-on-one peer mentorship. Continued advisor meetings will be required, and you are encouraged to use the Student Success Center. Flexible course scheduling and summer courses may be discussed. "
+    "Recovery milestones and weekly check-ins will track your progress. Plan adjustments will be based on academic recovery markers. Your path to graduation is possible with consistent effort and full engagement."
+)
 st.info(advising_text)
 
+# Outreach
 st.subheader("\U0001F4E2 Outreach Message")
-outreach = f"Hi {selected_name}, we noticed your GPA is {gpa:.2f}. Your success matters — let’s build a tailored support plan this semester. Please meet with your advisor and take advantage of academic coaching and summer bridge opportunities."
-st.text_area("Generated Message", value=outreach, height=100)
+st.markdown("**Generated Message**")
+message = f"Hi {selected_student}, we noticed your GPA is {gpa}. Your success matters — let's build a tailored support plan this semester. Please meet with your advisor and take advantage of academic coaching and summer bridge opportunities."
+st.text_area("", value=message, height=100)
 
+# TSU Policy Advisory
 st.subheader("\U0001F4DA TSU Policy Advisor")
-policy_topic = st.selectbox("Ask About:", ["maymester_tuition", "credit_limit", "academic_probation"])
-if policy_topic == "maymester_tuition":
-    st.caption("Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver.")
-elif policy_topic == "credit_limit":
-    st.caption("Students above 90 hours may require override for additional courses.")
+policy_option = st.selectbox("Ask About:", ["maymester_tuition", "credit_limit", "summer_enrollment"])
+if policy_option == "maymester_tuition":
+    policy_msg = "Students with 2.5+ GPA by Fall and advisor approval may qualify for MayMester waiver."
+elif policy_option == "credit_limit":
+    policy_msg = "Students above 90 hours may require override for additional courses."
 else:
-    st.caption("Students below 2.0 GPA may face academic probation with limited aid eligibility.")
+    policy_msg = "Summer enrollment support may depend on GPA and advisor clearance."
+st.markdown(policy_msg)
 
-st.subheader("\U0001F4CA GPA Snapshot")
-fig = go.Figure(data=[
-    go.Bar(
-        x=["Student GPA"],
-        y=[gpa],
-        marker_color='purple',
-        width=[0.4],
-        opacity=0.85
-    )
-])
-fig.update_layout(
-    yaxis=dict(range=[0, 4]),
-    title="3D-Style GPA Visualization",
-    template="plotly_white"
+policy_expl = (
+    "Our policies support student success by providing GPA-linked waivers, course load guidance, and semester planning flexibility. "
+    "Students nearing graduation may be eligible for overrides or tailored course pathways. Understanding policies helps reduce risk of delay, especially with summer and intersession terms. "
+    "Advisors will guide you through these policies so you can make informed decisions about graduation planning, financial aid eligibility, and load management."
 )
+st.caption(policy_expl)
+
+# GPA Snapshot
+st.subheader("\U0001F4CA GPA Snapshot")
+st.markdown("**Linear GPA Chart**")
+fig = go.Figure(data=[go.Bar(x=["Student GPA"], y=[gpa], marker_color='purple')])
+fig.update_layout(height=400, yaxis=dict(range=[0, 4]))
 st.plotly_chart(fig)
