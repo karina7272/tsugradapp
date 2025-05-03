@@ -91,7 +91,13 @@ y = tree_data["Risk"]
 model = DecisionTreeClassifier(max_depth=3)
 model.fit(X, y)
 fig, ax = plt.subplots(figsize=(10, 5))
-plot_tree(model, feature_names=["GPA", "Attendance", "Hours"], class_names=["Low/Med", "High"], filled=True)
+plot_tree(
+    model,
+    feature_names=["GPA", "Attendance", "Hours"],
+    class_names=["Low/Med", "High"],
+    filled=True,
+    fontsize=12  # <- makes "True" / "False" labels and nodes more visible
+)
 st.pyplot(fig)
 
 # Personalized Advising Plan
